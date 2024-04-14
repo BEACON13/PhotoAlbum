@@ -7,8 +7,7 @@ AMAZON_LEX_BOT = "PhotoSearch"
 LEX_BOT_ALIAS = "search"
 USER_ID = "user"
 
-
-S3_URL = "s3://photos-bucket-2024/"
+S3_URL = ""
 
 
 def post_to_lex(query, user_id=USER_ID):
@@ -24,12 +23,25 @@ def post_to_lex(query, user_id=USER_ID):
 
     print("lex-response", response)
 
-    labels = ""
-    if response['slots']['Label_one']:
-        labels = 'labels:' + response['slots']['Label_one']
-    if response['slots']['Label_two']:
-        labels += '+labels:' + response['slots']['Label_two']
-    return labels
+    # Check if the dialogState is 'ReadyForFulfillment' which means Lex recognized the intent successfully
+    if response.get('dialogState') == 'ReadyForFulfillment':
+        labels = ""
+        # Safely extract labels if they exist in slots
+        label_one = response.get('slots', {}).get('Label_one')
+        label_two = response.get('slots', {}).get('Label_two')
+
+        if label_one:
+            labels = 'labels:' + label_one
+        if label_two:
+            if labels:
+                labels += '+labels:' + label_two
+            else:
+                labels = 'labels:' + label_two
+
+        return labels
+
+    # If dialogState is not 'ReadyForFulfillment' or response does not contain the expected keys, return empty string
+    return ""
 
 
 def get_photos_ids(labels):
@@ -43,7 +55,7 @@ def get_photos_ids(labels):
 
     es_auth = (ES_ACCOUNT, ES_PASSWORD)
 
-    URL = ES_URL + "/_search?q=" +str(labels)
+    URL = ES_URL + "/_search?q=" + str(labels)
     print("URL: ", URL)
     print("Auth: ", es_auth)
     response = requests.get(URL, auth=es_auth).content
@@ -63,7 +75,7 @@ def get_photos_ids(labels):
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
+        'body': err.message if err else res,
         'headers': {
             'Content-Type': 'application/json',
             "Access-Control-Allow-Origin": "*",
@@ -73,14 +85,15 @@ def respond(err, res=None):
 
 
 def lambda_handler(event, context):
-    query = event['queryStringParameters']['q']
+    query_params = event.get('queryStringParameters', {})
+    query = query_params.get('q')
 
-    print(query)
+    print('query', query)
     labels = post_to_lex(query)
-    if labels == "":
+    if labels == "" or not query:
         response = {"results": []}
     else:
-        print(labels)
+        print('labels', labels)
 
         id_list, labels_list = get_photos_ids(labels)
 
