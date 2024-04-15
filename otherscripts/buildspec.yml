@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - echo Installing Python dependencies
+      - pip install -r requirements.txt -t build/package/
+
+  pre_build:
+    commands:
+      - echo Preparing the packages
+      - mkdir -p build/search_photos
+      - mkdir -p build/index_photos
+      - cp search_photos.py build/search_photos/lambda_function.py
+      - cp index_photos.py build/index_photos/lambda_function.py
+      - cp -R build/package build/search_photos/
+      - cp -R build/package build/index_photos/
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Lambda packages
+      - cd build/search_photos
+      - zip -r ../../search_photos.zip .
+      - cd ../index_photos
+      - zip -r ../../index_photos.zip .
+
+  post_build:
+    commands:
+      - echo Deploying Lambda functions
+      - aws lambda update-function-code --function-name search-photos --zip-file fileb://search_photos.zip
+      - aws lambda update-function-code --function-name index-photos --zip-file fileb://index_photos.zip
+
+artifacts:
+  files:
+    - search_photos.zip
+    - index_photos.zip
