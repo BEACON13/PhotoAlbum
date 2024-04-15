@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.8
+      python: 3.12
     commands:
       - echo Installing Python dependencies
       - pip install -r otherscripts/requirements.txt -t build/package/
@@ -13,8 +13,8 @@ phases:
       - echo Preparing the packages
       - mkdir -p build/search_photos
       - mkdir -p build/index_photos
-      - cp search_photos.py build/search_photos/lambda_function.py
-      - cp index_photos.py build/index_photos/lambda_function.py
+      - cp lambda_functions/search_photos.py build/search_photos/lambda_function.py
+      - cp lambda_functions/index_photos.py build/index_photos/lambda_function.py
       - cp -R build/package build/search_photos/
       - cp -R build/package build/index_photos/
 
