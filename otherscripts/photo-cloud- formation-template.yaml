@@ -1,0 +1,221 @@
+---
+Metadata:
+  TemplateId: "arn:aws:cloudformation:us-east-1:082933699269:generatedTemplate/bd486c9e-b5ed-4447-84b7-cb312ca27a5d"
+Parameters:
+  LambdaFunction00searchphotos00xSB2ZCodeS3BucketOneOfr2slr:
+    NoEcho: "true"
+    Type: "String"
+    Description: "An Amazon S3 bucket in the same AWS-Region as your function. The\
+      \ bucket can be in a different AWS-account.\nThis property can be replaced with\
+      \ other exclusive properties"
+  LambdaFunction00searchphotos00xSB2ZCodeS3KeyOneOft71h5:
+    NoEcho: "true"
+    Type: "String"
+    Description: "The Amazon S3 key of the deployment package.\nThis property can\
+      \ be replaced with other exclusive properties"
+  LambdaFunction00indexphotos006wslhCodeS3BucketOneOf8d0UP:
+    NoEcho: "true"
+    Type: "String"
+    Description: "An Amazon S3 bucket in the same AWS-Region as your function. The\
+      \ bucket can be in a different AWS-account.\nThis property can be replaced with\
+      \ other exclusive properties"
+  LambdaFunction00indexphotos006wslhCodeS3KeyOneOfpf40z:
+    NoEcho: "true"
+    Type: "String"
+    Description: "The Amazon S3 key of the deployment package.\nThis property can\
+      \ be replaced with other exclusive properties"
+Resources:
+  ApiGatewayDeployment0063oyk500Espuo:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  LambdaFunction00indexphotos006wslh:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::Lambda::Function"
+    DeletionPolicy: "Delete"
+    Properties:
+      MemorySize: 128
+      Description: ""
+      TracingConfig:
+        Mode: "PassThrough"
+      Timeout: 3
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "Auto"
+      Handler: "lambda_function.lambda_handler"
+      Code:
+        S3Bucket:
+          Ref: "LambdaFunction00indexphotos006wslhCodeS3BucketOneOf8d0UP"
+        S3Key:
+          Ref: "LambdaFunction00indexphotos006wslhCodeS3KeyOneOfpf40z"
+      Role: "arn:aws:iam::082933699269:role/service-role/index-photos-role-pz1r6tea"
+      FileSystemConfigs: []
+      FunctionName: "index-photos"
+      Runtime: "python3.12"
+      PackageType: "Zip"
+      LoggingConfig:
+        LogFormat: "Text"
+        LogGroup: "/aws/lambda/index-photos"
+      Environment:
+        Variables:
+          ES_PASSWORD: "Yf123456!"
+          ES_URL: " https://search-photos-5iq6ngjlb7nbvlom662guqbl5u.aos.us-east-1.on.aws"
+          ES_ACCOUNT: "photos-2024"
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+      - "arm64"
+  ApiGatewayDeployment00z5zfza00tz31O:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  ApiGatewayDeployment00yq22z000hsNSY:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  ApiGatewayDeployment00d4p7jp00f55H0:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  S3Bucket00photosbucket202400fYXMy:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Delete"
+    Properties:
+      NotificationConfiguration:
+        QueueConfigurations: []
+        TopicConfigurations: []
+        LambdaConfigurations:
+        - Function:
+            Fn::GetAtt:
+            - "LambdaFunction00indexphotos006wslh"
+            - "Arn"
+          Event: "s3:ObjectCreated:Put"
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        BlockPublicAcls: false
+      BucketName: "photos-bucket-2024"
+      CorsConfiguration:
+        CorsRules:
+        - MaxAge: 3000
+          AllowedMethods:
+          - "GET"
+          - "HEAD"
+          - "PUT"
+          AllowedOrigins:
+          - "*"
+          AllowedHeaders:
+          - "*"
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: "BucketOwnerEnforced"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: "AES256"
+  S3Bucket00nyuphotosalbum202400MoM1B:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Delete"
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: "index.html"
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        BlockPublicAcls: false
+      BucketName: "nyu-photos-album-2024"
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: "BucketOwnerPreferred"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: "AES256"
+  ApiGatewayRestApi00vq1t61oi2i00kdZD6:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::RestApi"
+    DeletionPolicy: "Delete"
+    Properties:
+      ApiKeySourceType: "HEADER"
+      Description: "AI Photo Search application, built during the Cloud and Big Data\
+        \ course at Columbia University."
+      EndpointConfiguration:
+        Types:
+        - "REGIONAL"
+      DisableExecuteApiEndpoint: false
+      BinaryMediaTypes:
+      - "image/*"
+      Name: "AI Photo Search"
+  ApiGatewayDeployment00wm4c9t004ixf0:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  LambdaFunction00searchphotos00xSB2Z:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::Lambda::Function"
+    DeletionPolicy: "Delete"
+    Properties:
+      MemorySize: 128
+      Description: ""
+      TracingConfig:
+        Mode: "PassThrough"
+      Timeout: 3
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "Auto"
+      Handler: "lambda_function.lambda_handler"
+      Code:
+        S3Bucket:
+          Ref: "LambdaFunction00searchphotos00xSB2ZCodeS3BucketOneOfr2slr"
+        S3Key:
+          Ref: "LambdaFunction00searchphotos00xSB2ZCodeS3KeyOneOft71h5"
+      Role: "arn:aws:iam::082933699269:role/service-role/search-photos-role-8qay3n2b"
+      FileSystemConfigs: []
+      FunctionName: "search-photos"
+      Runtime: "python3.12"
+      PackageType: "Zip"
+      LoggingConfig:
+        LogFormat: "Text"
+        LogGroup: "/aws/lambda/search-photos"
+      Environment:
+        Variables:
+          ES_PASSWORD: "Yf123456!"
+          ES_URL: "https://search-photos-5iq6ngjlb7nbvlom662guqbl5u.aos.us-east-1.on.aws"
+          ES_ACCOUNT: "photos-2024"
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+      - "x86_64"
+  ApiGatewayDeployment00zz3r7x00f68Fx:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
+  ApiGatewayDeployment00kx6fcp00UcyPC:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Delete"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00vq1t61oi2i00kdZD6"
