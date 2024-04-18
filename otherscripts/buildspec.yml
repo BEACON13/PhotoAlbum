@@ -6,17 +6,16 @@ phases:
       python: 3.12
     commands:
       - echo Installing Python dependencies
-      - pip install -r otherscripts/requirements.txt -t build/package/
+      - mkdir -p build/search_photos
+      - mkdir -p build/index_photos
+      - pip install -r otherscripts/requirements.txt -t build/search_photos/
+      - pip install -r otherscripts/requirements.txt -t build/index_photos/
 
   pre_build:
     commands:
       - echo Preparing the packages
-      - mkdir -p build/search_photos
-      - mkdir -p build/index_photos
       - cp lambda_functions/search_photos.py build/search_photos/lambda_function.py
       - cp lambda_functions/index_photos.py build/index_photos/lambda_function.py
-      - cp -R build/package build/search_photos/
-      - cp -R build/package build/index_photos/
 
   build:
     commands:
@@ -33,6 +32,7 @@ phases:
       - cd $CODEBUILD_SRC_DIR
       - aws lambda update-function-code --function-name search-photos --zip-file fileb://search_photos.zip
       - aws lambda update-function-code --function-name index-photos --zip-file fileb://index_photos.zip
+
 artifacts:
   files:
     - search_photos.zip
